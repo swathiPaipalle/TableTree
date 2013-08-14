@@ -1,0 +1,140 @@
+{config_load file="test.conf" section="setup"}
+{include file="header.html" title=treeTable}
+
+
+<section>
+	<section>
+		<div class="tools">
+			<ul class="staticSigns in_block">
+				<li class="plus_icon">Click on plus icon to unfold</li>
+				<li class="minus_icon">Click on minus to fold</li>
+			</ul>
+		</div><!--// .tools -->
+
+		<div>
+			<table id="tree" cellspacing="0" cellpadding="0">
+				<thead width="100%">
+					<tr>
+						<th width="10" colspan="2">Level</th>
+						<th width="100">A</th>
+						<th width="170">B</th>
+						<th width="120">C</th>
+						<th width="120">D</th>
+						<th width="150">E</th>
+					</tr>
+				</thead>
+				<tbody width="100%">
+					{{$element = $volume[0]}}
+					
+					<tr id="level_0" data-group-level="{{$element[0]}}">
+						<td><img class="showMagic" src="public/images/icon_plus.png"/></td>
+						<td>{{$element[0]}}</td>
+						<td>{{$element[2]}}</td>
+						<td>{{$element[1]}}</td>
+						<td>{{$element[3]}}</td>
+						<td>{{$element[4]}}</td>
+						<td>{{$element[5]}}</td>
+					</tr>					
+					
+					{{$counts = []}}
+					{{foreach from=$volume item=element name=row}}
+						{{if $element@iteration > 1}}
+							{{assign var=level value=$element[0]}}
+
+							{{if $level < $smarty.foreach.row.iteration[0]}}        <!-- We are entering a new level -->
+								{{$counts.$level = 0}}
+							{{else}}
+								{{$counts.$level =$counts.$level+1}}
+							{{/if}}
+
+							{{assign var=id value='0'}}                             <!--Build my id -->
+							{{assign var=idClass value='0'}}
+							{{for $loop=0 to $level}}
+								{{if $loop > 0}}
+									{{assign var=id value=$id|cat:"_"}}             <!-- Separate values with '-', but avoid leading '-' 	Ex:'0' => '0_', '0_1' => '0_1_', etc -->
+								{{/if}}
+									
+								{{assign var=idClass value=$id}}                     <!-- '0_' => '0_1', '0_1_' => '0_1_2', etc -->
+								{{assign var=id value=$id|cat:$counts.$loop}}
+							{{/for}}
+
+							{{assign var=hasChildren value= 0}}
+							{{assign var=nextLevel value=$smarty.foreach.row.iteration}}
+							{{if $volume[$nextLevel][0] gt $level}}
+								{{assign var=hasChildren value= 1}}
+							{{/if}}
+							{{if $level == "1"}}
+								{{assign var=class value="level1"}}
+							{{else}}
+								{{assign var=class value=''}}
+							{{/if}}
+
+							<tr class="level_{{$idClass}} {{$class}}" {{if $id != "0"}}style="display:none;"{{/if}}>
+								<td>
+									{{if $hasChildren}}<img id="level_{{$id}}" src="public/images/icon_plus.png" width="15" height="15" class="collapsed"/>{{/if}}
+								</td>
+								<td>{{$element[0]}}</td>
+								<td>{{$element[2]}}</td>
+								<td>{{$element[1]}}</td>
+								<td>{{$element[3]}}</td>
+								<td>{{$element[4]}}</td>
+								<td>{{$element[5]}}</td>
+							</tr>
+
+						{{/if}}
+						{{assign var='count' value=$count+1}}
+						{{assign var='lastLevel' value=$level}}
+					{{/foreach}}
+				</tbody>
+			</table>
+		</div>
+		
+	</section>
+</section>
+
+
+<script src="public/js/jquery-1.9.1.min.js"></script>
+<script src="public/js/jquery-migrate-1.1.1.min.js"></script>
+<script>
+	$(document).ready(function() {
+		$('.showMagic').live('click', function(){
+			$(this).attr('src','public/images/icon_minus.png');
+			$(".level1").show();
+			$(this).addClass('hideMagic');
+			$(this).removeClass('showMagic');
+		});
+
+		$('.hideMagic').live('click', function(){
+			$(this).attr('src','public/images/icon_plus.png');
+			$("tr[class^='level_0_']").hide();
+			$("img[id^='level_0_']").attr('src','public/images/icon_plus.png');
+			$("img[id^='level_0_']").removeClass('expanded');
+			$("img[id^='level_0_']").addClass('collapsed');
+			$(this).addClass('showMagic');
+			$(this).removeClass('hideMagic');
+		});
+
+		$('img.collapsed').live('click', function(){
+			var thisid = $(this).attr("id");
+			$("#"+thisid).attr('src','public/images/icon_minus.png');
+			$("#"+thisid).addClass('expanded');
+			$("#"+thisid).removeClass('collapsed');
+			$("."+thisid+"_").show();
+		});
+
+		$("img.expanded").live('click', function(){
+			var thisid = $(this).attr("id");
+			$("#"+thisid).attr('src','public/images/icon_plus.png');
+			$("img[id^='"+thisid+"_']").attr('src','public/images/icon_plus.png');
+			$("img[id^='"+thisid+"_']").removeClass('expanded');
+			$("img[id^='"+thisid+"_']").addClass('collapsed');
+			$("#"+thisid).removeClass('expanded');
+			$("#"+thisid).addClass('collapsed');
+			$("tr[class^='"+thisid+"']").hide();
+		});
+	});
+};
+</script>
+
+
+{include file="footer.html"}

@@ -1,0 +1,20 @@
+body{
+	
+}
+#tree thead tr th, #tree tbody tr td{
+	color:#666;
+	border-bottom: 1px solid #E1E1E1;
+    border-left: 1px solid #E1E1E1;
+    padding: 7px;
+    vertical-align: middle;
+	text-align:center;
+}
+#tree{
+	border-right: 1px solid #E1E1E1;
+}
+#tree thead tr{
+	background:none repeat scroll 0 0 #CCC;
+}
+#tree tbody tr{
+	background:none repeat scroll 0 0 #FEF9F4;
+}
